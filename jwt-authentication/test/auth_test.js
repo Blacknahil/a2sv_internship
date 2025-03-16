@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../server");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
 
 beforeAll(async () => {
@@ -15,17 +16,29 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-describe("User Registration", () => {
-  it("should register a user", async () => {
+describe("User Registration API", () => {
+  it("should register a user with a hashed password", async () => {
     const res = await request(app)
-      .post("/api/auth/register")
+      .post("/register") // Fixed endpoint
       .send({ username: "testuser", password: "plaintextpassword" });
 
     expect(res.status).toBe(201);
-    expect(res.body.message).toBe("User registered successfully (insecurely)");
+    expect(res.body).toHaveProperty("message");
 
     const user = await User.findOne({ username: "testuser" });
     expect(user).not.toBeNull();
-    expect(user.password).toBe("plaintextpassword");
+    
+    // Check if the stored password is hashed
+    const isPasswordHashed = await bcrypt.compare("plaintextpassword", user.password);
+    expect(isPasswordHashed).toBe(true);
+  });
+
+  it("should not allow duplicate usernames", async () => {
+    await request(app).post("/register").send({ username: "duplicateUser", password: "password123" });
+
+    const res = await request(app).post("/register").send({ username: "duplicateUser", password: "newpassword" });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("error", "Username already exists");
   });
 });
