@@ -18,7 +18,7 @@ afterAll(async () => {
 describe("User Registration", () => {
   it("should register a user", async () => {
     const res = await request(app)
-      .post("/api/auth/registe")
+      .post("/api/auth/register")
       .send({ username: "testuser", password: "plaintextpassword" });
 
     expect(res.status).toBe(201);
