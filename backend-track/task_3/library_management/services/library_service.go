@@ -6,38 +6,64 @@ import (
 )
 
 type LibraryManager interface {
-	addBook(book models.Book)
-	removeBook(bookId int)
-	borrowBook(bookId int, memberId int) error
-	returnBook(bookId int, memberId int) error
-	listAvailableBooks() []models.Book
-	listBorrowedBooks(memberId int) []models.Book
+	AddBook(title, author string)
+	AddMember(name string)
+	RemoveBook(bookId int)
+	BorrowBook(bookId int, memberId int) error
+	ReturnBook(bookId int, memberId int) error
+	ListAvailableBooks() []models.Book
+	ListBorrowedBooks(memberId int) []models.Book
+	ListMemebers() []models.Member
 }
 
 type Library struct {
-	books   map[int]models.Book
-	members map[int]models.Member
+	books        map[int]models.Book
+	members      map[int]models.Member
+	nextBookId   int
+	nextMemberId int
 }
 
 func NewLibrary() *Library {
 	newLibrary := Library{
-		books:   make(map[int]models.Book),
-		members: make(map[int]models.Member),
+		books:        make(map[int]models.Book),
+		members:      make(map[int]models.Member),
+		nextBookId:   1,
+		nextMemberId: 1,
 	}
 	return &newLibrary
 }
 
 // implemenet the library manager interface for the library struct
 
-func (l *Library) addBook(book models.Book) {
-	l.books[book.ID] = book
+func (l *Library) AddBook(title, author string) {
+	book := models.Book{
+		ID:     l.nextBookId,
+		Title:  title,
+		Author: author,
+		Status: "Available",
+	}
+	l.books[l.nextBookId] = book
+	l.nextBookId++
+}
+func (l *Library) AddMember(name string) {
+	newMember := models.Member{ID: l.nextMemberId, Name: name, BorrowedBooks: []models.Book{}}
+	l.members[newMember.ID] = newMember
+	l.nextMemberId++
 }
 
-func (l *Library) removeBook(id int) {
+func (l *Library) RemoveBook(id int) error {
+	book, book_exists := l.books[id]
+	if !(book_exists) {
+		return errors.New("book not found")
+	}
+	if book.Status == "Borrowed" {
+		return errors.New("book not in the library")
+	}
 	delete(l.books, id)
+	return nil
 }
 
-func (l *Library) borrowBook(bookId int, memberId int) error {
+func (l *Library) BorrowBook(bookId int, memberId int) error {
 	// the book may not exist in the library
 	book, book_exists := l.books[bookId]
 	if !book_exists {
@@ -63,7 +89,7 @@ func (l *Library) borrowBook(bookId int, memberId int) error {
 	return nil
 }
 
-func (l *Library) returnBook(bookId int, memeberId int) error {
+func (l *Library) ReturnBook(bookId int, memeberId int) error {
 	// the book may not exist
 	book, book_exists := l.books[bookId]
 	if !book_exists {
@@ -97,7 +123,7 @@ func (l *Library) returnBook(bookId int, memeberId int) error {
 
 }
 
-func (l *Library) listAvailableBooks() []models.Book {
+func (l *Library) ListAvailableBooks() []models.Book {
 
 	var found_books []models.Book
 
@@ -112,18 +138,22 @@ func (l *Library) listAvailableBooks() []models.Book {
 
 }
 
-func (l *Library) listBorrowedBooks() []models.Book {
+func (l *Library) ListBorrowedBooks(memberId int) []models.Book {
 
-	var borrowed_books []models.Book
-
-	for _, book := range l.books {
-
-		if book.Status == "Borrowed" {
-			borrowed_books = append(borrowed_books, book)
-		}
+	member, exists := l.members[memberId]
+	if !exists {
+		return nil
 	}
+	return member.BorrowedBooks
 
-	return borrowed_books
+}
+
+func (l *Library) ListMemebers() []models.Member {
+	var member_list []models.Member
+	for _, value := range l.members {
+		member_list = append(member_list, value)
+	}
+	return member_list
 }
 
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
@@ -132,15 +162,16 @@ func (l *Library) listBorrowedBooks() []models.Book {
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-// /kbjsdbjbjfs/jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jhhjsdhjfhjsfkdfjgjksdjbfjksfjsjdhjsdjhjksdjk
+// /kbjsdbjbjfs/jkdfbjkgkdfbjdf jkdfjgjksdjbfjkfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdf jhhjsdhjfhjsfkdfjgjksdjbfjksjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdhjbjhsdjhbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjhjsdjhjksdjk
+//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdjhjksdjk
+//jkdfbjkgkdfbjdf sdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdfdhjjhsdhjjhsdjkdfjgdfhbjhjfdhjfhjdsksdjbfjksdfjsjdhjsdjhjksdjk
+// /jsdjhjksdjk
+//jkdfbjkgkdfjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdsdjhjfshjhjfshjjksdjk
-//dhjjhsdjhjhsdkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjddhjbjshdhjfshjdjhjsdjhjksdjk
+//dhjjhsdjhjhsdkdfbjkgkdfbjdf jkdfjgjksdhjjhsjhhjshjbfksdbfjsjddhjbjshdhjfshjdjhjsdjhjksdjk
+// hjhj
