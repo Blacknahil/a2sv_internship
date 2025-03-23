@@ -37,7 +37,7 @@ func (r *ReservationWorker) ReserveBook(bookID int, memberID int, books map[int]
 
 	go func() {
 		select {
-		case <-time.After(5 * time.Second):
+		case <-time.After(15 * time.Second):
 			r.mu.Lock()
 			if books[bookID].Status == "Reserved" {
 				books[bookID] = models.Book{ID: bookID, Title: book.Title, Author: book.Author, Status: "Available"}
@@ -78,6 +78,5 @@ func (r *ReservationWorker) CancelReservation(bookID int) {
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 // hjjhhjfd
+// dhjjhsdhj
