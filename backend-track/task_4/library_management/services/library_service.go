@@ -2,7 +2,9 @@ package services
 
 import (
 	"errors"
+	"library_management/concurrency"
 	"library_management/models"
+	"sync"
 )
 
 type LibraryManager interface {
@@ -11,24 +13,28 @@ type LibraryManager interface {
 	RemoveBook(bookId int)
 	BorrowBook(bookId int, memberId int) error
 	ReturnBook(bookId int, memberId int) error
+	ReserveBook(bookID int, memberID int) error
 	ListAvailableBooks() []models.Book
 	ListBorrowedBooks(memberId int) []models.Book
 	ListMemebers() []models.Member
 }
 
 type Library struct {
-	books        map[int]models.Book
-	members      map[int]models.Member
-	nextBookId   int
-	nextMemberId int
+	books              map[int]models.Book
+	members            map[int]models.Member
+	nextBookId         int
+	nextMemberId       int
+	mu                 sync.Mutex
+	ReservationHandler *concurrency.ReservationWorker
 }
 
 func NewLibrary() *Library {
 	newLibrary := Library{
-		books:        make(map[int]models.Book),
-		members:      make(map[int]models.Member),
-		nextBookId:   1,
-		nextMemberId: 1,
+		books:              make(map[int]models.Book),
+		members:            make(map[int]models.Member),
+		nextBookId:         1,
+		nextMemberId:       1,
+		ReservationHandler: concurrency.NewReservationWorker(),
 	}
 	return &newLibrary
 }
@@ -36,6 +42,8 @@ func NewLibrary() *Library {
 // implemenet the library manager interface for the library struct
 
 func (l *Library) AddBook(title, author string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	book := models.Book{
 		ID:     l.nextBookId,
 		Title:  title,
@@ -46,12 +54,16 @@ func (l *Library) AddBook(title, author string) {
 	l.nextBookId++
 }
 func (l *Library) AddMember(name string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	newMember := models.Member{ID: l.nextMemberId, Name: name, BorrowedBooks: []models.Book{}}
 	l.members[newMember.ID] = newMember
 	l.nextMemberId++
 }
 
 func (l *Library) RemoveBook(id int) error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	book, book_exists := l.books[id]
 	if !(book_exists) {
 		return errors.New("book not found")
@@ -64,6 +76,8 @@ func (l *Library) RemoveBook(id int) error {
 }
 
 func (l *Library) BorrowBook(bookId int, memberId int) error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	// the book may not exist in the library
 	book, book_exists := l.books[bookId]
 	if !book_exists {
@@ -86,10 +100,15 @@ func (l *Library) BorrowBook(bookId int, memberId int) error {
 	// change(update) the status of book and memner inside the library
 	l.books[book.ID] = book
 	l.members[member.ID] = member
+	l.ReservationHandler.CancelReservation(bookId)
+
 	return nil
 }
 
 func (l *Library) ReturnBook(bookId int, memeberId int) error {
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	// the book may not exist
 	book, book_exists := l.books[bookId]
 	if !book_exists {
@@ -123,7 +142,14 @@ func (l *Library) ReturnBook(bookId int, memeberId int) error {
 
 }
 
+func (l *Library) ReserveBook(bookID, memberID int) error {
+	return l.ReservationHandler.ReserveBook(bookID, memberID, l.books)
+}
+
 func (l *Library) ListAvailableBooks() []models.Book {
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
 
 	var found_books []models.Book
 
@@ -140,6 +166,9 @@ func (l *Library) ListAvailableBooks() []models.Book {
 
 func (l *Library) ListBorrowedBooks(memberId int) []models.Book {
 
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	member, exists := l.members[memberId]
 	if !exists {
 		return nil
@@ -149,6 +178,10 @@ func (l *Library) ListBorrowedBooks(memberId int) []models.Book {
 }
 
 func (l *Library) ListMemebers() []models.Member {
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	var member_list []models.Member
 	for _, value := range l.members {
 		member_list = append(member_list, value)
@@ -167,11 +200,9 @@ func (l *Library) ListMemebers() []models.Member {
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdhjbjhsdjhbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdjhjksdjk
 //jkdfbjkgkdfbjdf sdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdfdhjjhsdhjjhsdjkdfjgdfhbjhjfdhjfhjdsksdjbfjksdfjsjdhjsdjhjksdjk
-// /jsdjhjksdjk
 //jkdfbjkgkdfjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdsdjhjfshjhjfshjjksdjk
-//dhjjhsdjhjhsdkdfbjkgkdfbjdf jkdfjgjksdhjjhsjhhjshjbfksdbfjsjddhjbjshdhjfshjdjhjsdjhjksdjk
-// hjhj
+//dhjjhsdjhjhsdkdfbjkgkdfbjdf
+// jvjkxdfjbbjb// hjhj
