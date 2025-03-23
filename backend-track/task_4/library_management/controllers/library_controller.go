@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"library_management/services"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func RunLibrarySystem() {
@@ -19,11 +21,12 @@ func RunLibrarySystem() {
 		fmt.Println("2. Add Member")
 		fmt.Println("3. Remove Book")
 		fmt.Println("4. Borrow Book")
-		fmt.Println("5. Return Book")
-		fmt.Println("6. List Members")
-		fmt.Println("7. List Available Books")
-		fmt.Println("8. List Borrowed Books")
-		fmt.Println("9. Exit")
+		fmt.Println("5. Reserve Book")
+		fmt.Println("6. Return Book")
+		fmt.Println("7. List Members")
+		fmt.Println("8. List Available Books")
+		fmt.Println("9. List Borrowed Books")
+		fmt.Println("10. Exit")
 		fmt.Print("Enter choice: ")
 		fmt.Scanln(&choice)
 
@@ -65,6 +68,29 @@ func RunLibrarySystem() {
 				fmt.Println(" \033[33m Book borrowed successfully! \033[0m ")
 			}
 		case 5:
+			fmt.Print("Enter book ID to reserve: ")
+			bookID, _ := reader.ReadString('\n')
+			bookID = strings.TrimSpace(bookID)
+			id, err := strconv.Atoi(bookID)
+			if err == nil {
+				fmt.Print("Enter member ID: ")
+				memberID, _ := reader.ReadString('\n')
+				memberID = strings.TrimSpace(memberID)
+				memID, err := strconv.Atoi(memberID)
+				if err == nil {
+					if err := library.ReserveBook(id, memID); err == nil {
+						fmt.Println("\033[33m Book reserved successfully! \033[0m")
+					} else {
+						fmt.Println("\033[30m Error:", err, "\033[0m")
+					}
+				} else {
+					fmt.Println("Invalid member ID")
+				}
+			} else {
+				fmt.Println("Invalid book ID")
+			}
+
+		case 6:
 
 			var bookID, memberID int
 			fmt.Print("Enter book ID to return: ")
@@ -76,20 +102,20 @@ func RunLibrarySystem() {
 			} else {
 				fmt.Println("\033[33m Book returned successfully!\033[0m")
 			}
-		case 6:
+		case 7:
 			members := library.ListMemebers()
 			fmt.Println("\033[33m Library members  \033[0m", members)
 
-		case 7:
+		case 8:
 			books := library.ListAvailableBooks()
 			fmt.Println("\033[33m Available Books:  \033[0m ", books)
-		case 8:
+		case 9:
 			var memberID int
 			fmt.Print("Enter member ID: ")
 			fmt.Scanln(&memberID)
 			books := library.ListBorrowedBooks(memberID)
 			fmt.Println("\033[33m Borrowed Books: \033[0m ", books)
-		case 9:
+		case 10:
 			fmt.Println(" \033[35m Existing ...... Goodbye\033[0m")
 			return
 		}
@@ -116,5 +142,5 @@ func RunLibrarySystem() {
 //jkdfbjkgkdfbjdf jkdfjksdjk
 // /fjkdjbkjkdfj/jhlshdjjhsdfhjhjdsfjksdjk
 // jmbxcvhjdjh
-// \033[33m \033[0m
+// \033[33m dhjdhjhjfdhj033[0m
 // hjdsfjhdhjsjh
