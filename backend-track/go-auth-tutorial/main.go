@@ -19,8 +19,8 @@ func main() {
 	})
 
 	router.POST("/register", controller.Register)
-	router.POST("/login", controller.Login)
-	router.GET("/users", controller.GetUsers)
+	router.POST("/login", controller.Login) // protect it with a middle ware
+	router.GET("/users", AuthMiddleware(), controller.GetUsers)
 
 	router.Run()
 }
@@ -56,7 +56,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		token, err := jwt.Parse(authParts[1], func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
 			return controller.JwtSecret, nil
@@ -67,6 +67,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		c.Next()
 
 	}
 }
@@ -76,6 +77,10 @@ func AuthMiddleware() gin.HandlerFunc {
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdfjkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdf jkhfjhdsjhfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
@@ -84,10 +89,6 @@ func AuthMiddleware() gin.HandlerFunc {
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdf dkjbsdbkjkjjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
