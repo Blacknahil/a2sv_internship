@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
-	userCollection *mongo.Collection
-	taskCollection *mongo.Collection
+	UserCollection *mongo.Collection
+	TaskCollection *mongo.Collection
 )
 
 func IntializeMongoBD() {
@@ -47,9 +48,31 @@ func IntializeMongoBD() {
 
 	fmt.Println("Successfully Connected to MongoDB!")
 
-	userCollection = client.Database("taskdb2").Collection("users")
-	taskCollection = client.Database("taskdb2").Collection("tasks")
+	UserCollection = client.Database("taskdb2").Collection("users")
+	TaskCollection = client.Database("taskdb2").Collection("tasks")
 
+	err = createUniqueFieldIndex(ctx, UserCollection, "email")
+	if err != nil {
+		log.Fatalf("Failed to create unique index on email: %v", err)
+	}
+
+}
+
+func createUniqueFieldIndex(ctx context.Context, collection *mongo.Collection, uniqueField string) error {
+
+	// create the unique index on the email field
+
+	indexModel := mongo.IndexModel{
+		Keys:    bson.M{uniqueField: 1}, // create an index on the unique field
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err := collection.Indexes().CreateOne(ctx, indexModel)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Unique index on '%v' created succesfully! \n", uniqueField)
+	return nil
 }
 
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
@@ -58,9 +81,8 @@ func IntializeMongoBD() {
 // /dbjjhdsjhjhd
 // jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdffjksdkjskjd
-// jk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjshjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbdjksjkjksjk
+// adhjashjahjs
+// /jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjshjksdjk
+//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjdfjhdfsjhjhds
+// sdjk
