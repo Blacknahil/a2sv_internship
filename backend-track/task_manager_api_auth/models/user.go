@@ -24,8 +24,15 @@ func (u *User) MarshalJSON() ([]byte, error) {
 	})
 }
 
+type LoginResponse struct {
+	AccessToken string             `bson:"access_token"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Role        string             `bson:"role"`
+}
+
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjdfnsjkjskj
-// sdjfjksdfj
+//jkdfbjkgkdfbjdfdjbjsdjdsj
+// jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjdfnsjkjskj
+// sdjfjksdfdjhbdjshdjfhhj
 //jkjhfjdskjksdfjk
 // fbjkgkdfbjdf jkdfjgjksdjbfjksdsjdhjsdjhjksdjk
