@@ -1,24 +1,31 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type User struct {
-	ID       uint   `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Email    string             `json:"email"`
+	Password string             `json:"password"`
+	Role     string             `json:"role"`
 }
 
 func (u *User) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(struct {
-		ID    uint   `json:"id"`
+		ID    string `json:"id"`
 		Email string `json:"email"`
 	}{
-		ID:    u.ID,
+		ID:    u.ID.Hex(),
 		Email: u.Email,
 	})
 }
 
 //jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
+//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjdfnsjkjskj
+// sdjfjksdfj
+//jkjhfjdskjksdfjk
+// fbjkgkdfbjdf jkdfjgjksdjbfjksdsjdhjsdjhjksdjk
