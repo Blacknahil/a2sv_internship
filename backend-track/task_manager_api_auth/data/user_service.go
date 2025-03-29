@@ -3,8 +3,13 @@ package data
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
+	"strconv"
 	"task_manager_api_auth/models"
+	"time"
 
+	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
@@ -39,10 +44,79 @@ func (us *UserServices) RegisterUser(ctx context.Context, user models.User) erro
 	// save to database mongoDB userCollection
 	_, err = us.UserCollection.InsertOne(ctx, user)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return errors.New("email already exists")
+		}
 		return err
 	}
 
 	return nil
+}
+
+func (us *UserServices) Login(ctx context.Context, user models.User) (models.LoginResponse, error) {
+	err := inputValidation(user)
+	if err != nil {
+		return models.LoginResponse{}, err
+	}
+
+	var existingUser models.User
+
+	// check if the user with the email already exists
+	filter := bson.M{"email": user.Email}
+	err = us.UserCollection.FindOne(context.TODO(), filter).Decode(&existingUser)
+	if err != nil {
+		return models.LoginResponse{}, errors.New("invalid password or email")
+	}
+
+	// compare the hashes
+	err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(user.Password))
+	if err != nil {
+		return models.LoginResponse{}, errors.New("invalid password or email")
+	}
+
+	// give the user email and Id to generate the jwt
+	expireTimes, err := strconv.Atoi(os.Getenv("ACCESS_TOKEN_EXPIRY_MINUTES"))
+	if err != nil {
+		expireTimes = 20 // deafult time for token expiration
+	}
+	token, err := generateJWT(existingUser, expireTimes)
+
+	if err != nil {
+		return models.LoginResponse{}, err
+	}
+	// return the token and/error
+	loginResponse := models.LoginResponse{
+		AccessToken: token,
+		ID:          existingUser.ID,
+		Role:        existingUser.Role,
+	}
+	return loginResponse, nil
+}
+
+func generateJWT(user models.User, expiry int) (string, error) {
+
+	expirationTime := time.Now().Add(time.Duration(expiry) * time.Minute)
+	customClaims := jwt.MapClaims{
+		"user_id": user.ID,
+		"email":   user.Email,
+		"role":    user.Role,
+		"exp":     expirationTime.Unix(),
+	}
+
+	// get the secret key from the .env file
+	secretKey := os.Getenv("JWT_SECRET")
+	if secretKey == "" {
+		return "", fmt.Errorf("JWT_SECRET environment variable is not set")
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaims)
+	signedAccessToken, err := token.SignedString([]byte(secretKey))
+
+	if err != nil {
+		return "", err
+	}
+	return signedAccessToken, nil
+
 }
 
 func inputValidation(user models.User) error {
@@ -90,4 +164,7 @@ func (us *UserServices) checkIfAdmin(ctx context.Context) (bool, error) {
 }
 
 // dsjhjsdjjsd
-// / djh
+// / djjsjksj
+// djkjdsfhjjh
+// djkjdsjdsj
+// jhsdjhhjsd
