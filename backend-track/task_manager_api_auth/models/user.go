@@ -29,10 +29,3 @@ type LoginResponse struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Role        string             `bson:"role"`
 }
-
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdfdjbjsdjdsj
-// jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjdfnsjkjskj
-// sdjfjksdfdjhbdjshdjfhhj
-//jkjhfjdskjksdfjk
-// fbjkgkdfbjdf jkdfjgjksdjbfjksdsjdhjsdjhjksdjk
