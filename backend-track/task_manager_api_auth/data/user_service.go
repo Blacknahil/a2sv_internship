@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"task_manager_api_auth/constants"
 	"task_manager_api_auth/models"
 	"time"
 
@@ -96,11 +97,13 @@ func (us *UserServices) Login(ctx context.Context, user models.User) (models.Log
 func generateJWT(user models.User, expiry int) (string, error) {
 
 	expirationTime := time.Now().Add(time.Duration(expiry) * time.Minute)
-	customClaims := jwt.MapClaims{
-		"user_id": user.ID,
-		"email":   user.Email,
-		"role":    user.Role,
-		"exp":     expirationTime.Unix(),
+	customClaims := models.CustomJWTClaims{
+		UserID: user.ID,
+		Email:  user.Email,
+		Role:   user.Role,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
 	}
 
 	// get the secret key from the .env file
@@ -109,7 +112,7 @@ func generateJWT(user models.User, expiry int) (string, error) {
 		return "", fmt.Errorf("JWT_SECRET environment variable is not set")
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaims)
+	token := jwt.NewWithClaims(jwt.GetSigningMethod(constants.SigningMethod), customClaims)
 	signedAccessToken, err := token.SignedString([]byte(secretKey))
 
 	if err != nil {
@@ -162,9 +165,3 @@ func (us *UserServices) checkIfAdmin(ctx context.Context) (bool, error) {
 	return true, nil
 	// return true to make the first user an admin
 }
-
-// dsjhjsdjjsd
-// / djjsjksj
-// djkjdsfhjjh
-// djkjdsjdsj
-// jhsdjhhjsd
