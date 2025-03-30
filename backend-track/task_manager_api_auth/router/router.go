@@ -3,6 +3,7 @@ package router
 import (
 	controllers "task_manager_api_auth/controller"
 	"task_manager_api_auth/data"
+	"task_manager_api_auth/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,29 +20,18 @@ func SetUpRouter(r *gin.Engine) {
 
 	user := r.Group("/users")
 	{
-		user.GET("/", userController.GetAllUsers)
+		user.GET("/", middleware.AuthMiddleware(), middleware.AdminMiddleware(), userController.GetAllUsers)
 		user.POST("/register", userController.Register)
 		user.POST("/login", userController.Login)
 	}
 
 	task := r.Group("/tasks")
 	{
-		task.POST("/", taskController.CreateTask)
-		task.GET("/", taskController.GetAllTasks)
-		task.GET("/:id", taskController.GetTasksById)
-		task.PUT("/:id", taskController.UpdateTask)
-		task.DELETE("/:id", taskController.DeleteTask)
+		task.POST("/", middleware.AuthMiddleware(), middleware.AdminMiddleware(), taskController.CreateTask)
+		task.GET("/", middleware.AuthMiddleware(), taskController.GetAllTasks)
+		task.GET("/:id", middleware.AuthMiddleware(), taskController.GetTasksById)
+		task.PUT("/:id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), taskController.UpdateTask)
+		task.DELETE("/:id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), taskController.DeleteTask)
 	}
 
 }
-
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-//jkdfbjkgkdfbjdf jkdfjgjksdjbfjksdbfjsjdhjsdjhjksdjk
-// kjdjkdskjksdj
