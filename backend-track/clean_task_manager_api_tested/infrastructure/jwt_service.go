@@ -1,8 +1,8 @@
 package infrastructure
 
 import (
-	"clean-task-manager-api/constants"
-	"clean-task-manager-api/domain"
+	"clean_task_manager_api_tested/constants"
+	"clean_task_manager_api_tested/domain"
 	"fmt"
 	"os"
 	"time"
