@@ -2,6 +2,7 @@
 package utils
 
 import (
+	"clean_task_manager_api_tested/domain"
 	"context"
 	"fmt"
 	"log"
@@ -14,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func IntializeMongoBD() mongo.Database {
+func IntializeMongoBD() domain.DatabaseInterface {
 
 	err := godotenv.Load()
 	if err != nil {
@@ -51,7 +52,8 @@ func IntializeMongoBD() mongo.Database {
 	if err != nil {
 		log.Fatalf("Failed to create unique index on email: %v", err)
 	}
-	return *client.Database("TaskAPIdb3")
+	db := client.Database("TaskAPIdb3")
+	return NewMongoDatabaseWrapper(db)
 
 }
 
