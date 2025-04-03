@@ -1,13 +1,13 @@
 package router
 
 import (
-	"clean-task-manager-api/delivery/controllers"
-	"clean-task-manager-api/infrastructure"
+	"clean_task_manager_api_tested/domain"
+	"clean_task_manager_api_tested/infrastructure"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetUp(r *gin.Engine, userController *controllers.UserController, taskController *controllers.TaskController) {
+func SetUp(r *gin.Engine, userController domain.UserControllerInterface, taskController domain.TaskControllerInterface) {
 
 	authMiddleware := infrastructure.AuthMiddleware()
 	adminMiddleware := infrastructure.AdminMiddleware()
