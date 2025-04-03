@@ -2,17 +2,16 @@
 package repository
 
 import (
-	"clean-task-manager-api/domain"
+	"clean_task_manager_api_tested/domain"
 	"context"
 	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type taskRepositoryImpl struct {
-	database   mongo.Database
+	database   domain.DatabaseInterface
 	collection string
 }
 
@@ -137,7 +136,7 @@ func (tr *taskRepositoryImpl) UpdateTask(c context.Context, taskID string, task 
 	return nil
 }
 
-func NewTaskRepositoryImpl(db mongo.Database, collection string) domain.TaskRepositoryInteface {
+func NewTaskRepositoryImpl(db domain.DatabaseInterface, collection string) domain.TaskRepositoryInteface {
 
 	return &taskRepositoryImpl{
 		database:   db,

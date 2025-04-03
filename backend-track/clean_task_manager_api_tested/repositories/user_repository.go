@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"clean-task-manager-api/domain"
-	"clean-task-manager-api/infrastructure"
+	"clean_task_manager_api_tested/domain"
+	"clean_task_manager_api_tested/infrastructure"
 	"context"
 	"errors"
 	"os"
@@ -13,12 +13,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type userRepositoryImpl struct {
-	database   mongo.Database
+type UserRepositoryImpl struct {
+	database   domain.DatabaseInterface
 	collection string
 }
 
-func (ur *userRepositoryImpl) Register(c context.Context, user domain.User) error {
+func (ur *UserRepositoryImpl) Register(c context.Context, user domain.User) error {
 	// check if the user does not try to mess up with our database
 	collection := ur.database.Collection(ur.collection)
 
@@ -36,7 +36,7 @@ func (ur *userRepositoryImpl) Register(c context.Context, user domain.User) erro
 	user.Password = string(hashedPassword)
 
 	// should we make the first user admin ?
-	isAdmin, err := infrastructure.CheckIfAdmin(c, *collection)
+	isAdmin, err := infrastructure.CheckIfAdmin(c, collection)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (ur *userRepositoryImpl) Register(c context.Context, user domain.User) erro
 
 }
 
-func (ur *userRepositoryImpl) Login(c context.Context, loginRequest domain.LoginRequest) (domain.LoginResponse, error) {
+func (ur *UserRepositoryImpl) Login(c context.Context, loginRequest domain.LoginRequest) (domain.LoginResponse, error) {
 	collection := ur.database.Collection(ur.collection)
 
 	err := infrastructure.InputValidation(loginRequest)
@@ -101,7 +101,7 @@ func (ur *userRepositoryImpl) Login(c context.Context, loginRequest domain.Login
 	return loginResponse, nil
 
 }
-func (ur *userRepositoryImpl) Promote(c context.Context, userID string) error {
+func (ur *UserRepositoryImpl) Promote(c context.Context, userID string) error {
 	collection := ur.database.Collection(ur.collection)
 
 	// Convert userID to ObjectID
@@ -134,10 +134,14 @@ func (ur *userRepositoryImpl) Promote(c context.Context, userID string) error {
 	return nil
 }
 
-func NewUserRepositoryImpl(db mongo.Database, collection string) domain.UserRepositoryInterface {
+func NewUserRepositoryImpl(db domain.DatabaseInterface, collection string) domain.UserRepositoryInterface {
 
-	return &userRepositoryImpl{
+	return &UserRepositoryImpl{
 		database:   db,
 		collection: collection,
 	}
 }
+
+// djhfjhsdjhdsjfkdjbjkdsbjksdbj
+// dkjakjsdjk
+// kjsdkjjkdsjk
