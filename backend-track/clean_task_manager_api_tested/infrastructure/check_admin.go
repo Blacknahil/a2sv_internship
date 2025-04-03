@@ -1,13 +1,13 @@
 package infrastructure
 
 import (
+	"clean_task_manager_api_tested/domain"
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CheckIfAdmin(ctx context.Context, collection mongo.Collection) (bool, error) {
+func CheckIfAdmin(ctx context.Context, collection domain.CollectionInterface) (bool, error) {
 	// check if the user collection is empty
 	count, err := collection.CountDocuments(ctx, bson.M{})
 
