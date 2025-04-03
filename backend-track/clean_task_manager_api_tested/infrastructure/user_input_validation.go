@@ -1,7 +1,7 @@
 package infrastructure
 
 import (
-	"clean-task-manager-api/domain"
+	"clean_task_manager_api_tested/domain"
 	"errors"
 )
 
