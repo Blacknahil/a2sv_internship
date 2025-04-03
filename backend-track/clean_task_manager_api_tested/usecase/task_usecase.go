@@ -1,45 +1,45 @@
 package usecase
 
 import (
-	"clean-task-manager-api/domain"
+	"clean_task_manager_api_tested/domain"
 	"context"
 	"time"
 )
 
-type taskUsecase struct {
+type TaskUsecase struct {
 	taskRepositoryInteface domain.TaskRepositoryInteface
 	contextTimeout         time.Duration
 }
 
-// lets implement the taskUsecase interface methods
+// lets implement the TaskUsecase interface methods
 
-func (tu *taskUsecase) Create(c context.Context, task *domain.Task) (*domain.Task, error) {
+func (tu *TaskUsecase) Create(c context.Context, task *domain.Task) (*domain.Task, error) {
 	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
 	defer cancel()
 	return tu.taskRepositoryInteface.Create(ctx, task)
 }
 
-func (tu *taskUsecase) GetAllTasks(c context.Context) ([]domain.Task, error) {
+func (tu *TaskUsecase) GetAllTasks(c context.Context) ([]domain.Task, error) {
 
 	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
 	defer cancel()
 	return tu.taskRepositoryInteface.GetAllTasks(ctx)
 }
 
-func (tu *taskUsecase) GetTaskByID(c context.Context, taskID string) (*domain.Task, error) {
+func (tu *TaskUsecase) GetTaskByID(c context.Context, taskID string) (*domain.Task, error) {
 
 	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
 	defer cancel()
 	return tu.taskRepositoryInteface.GetTaskByID(ctx, taskID)
 }
 
-func (tu *taskUsecase) UpdateTask(c context.Context, taskID string, task *domain.Task) error {
+func (tu *TaskUsecase) UpdateTask(c context.Context, taskID string, task *domain.Task) error {
 	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
 	defer cancel()
 	return tu.taskRepositoryInteface.UpdateTask(ctx, taskID, task)
 }
 
-func (tu *taskUsecase) DeleteTask(c context.Context, taskID string) error {
+func (tu *TaskUsecase) DeleteTask(c context.Context, taskID string) error {
 	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
 	defer cancel()
 	return tu.taskRepositoryInteface.DeleteTask(ctx, taskID)
@@ -47,7 +47,7 @@ func (tu *taskUsecase) DeleteTask(c context.Context, taskID string) error {
 
 func NewTaskUsecase(taskRepositoryInterface domain.TaskRepositoryInteface, timeout time.Duration) domain.TaskUsecaseInteface {
 
-	return &taskUsecase{
+	return &TaskUsecase{
 		taskRepositoryInteface: taskRepositoryInterface,
 		contextTimeout:         timeout,
 	}
