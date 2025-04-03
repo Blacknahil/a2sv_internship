@@ -1,17 +1,17 @@
 package controllers
 
 import (
-	"clean-task-manager-api/domain"
+	"clean_task_manager_api_tested/domain"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
-	UserUsecase domain.UserUseCaseInterface
+	UserUsecase domain.UserUsecaseInterface
 }
 
-func NewUserController(uu domain.UserUseCaseInterface) *UserController {
+func NewUserController(uu domain.UserUsecaseInterface) *UserController {
 	return &UserController{UserUsecase: uu}
 }
 
