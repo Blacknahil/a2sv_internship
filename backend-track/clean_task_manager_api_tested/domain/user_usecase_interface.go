@@ -18,7 +18,7 @@ type LoginResponse struct {
 	Role        string             `bson:"role"`
 }
 
-type UserUseCaseInterface interface {
+type UserUsecaseInterface interface {
 	Register(c context.Context, user User) error
 	Login(c context.Context, loginRequest LoginRequest) (LoginResponse, error)
 	Promote(c context.Context, userID string) error
