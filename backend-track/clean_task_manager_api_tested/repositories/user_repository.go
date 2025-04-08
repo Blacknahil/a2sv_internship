@@ -71,7 +71,7 @@ func (ur *UserRepositoryImpl) Login(c context.Context, loginRequest domain.Login
 	var existingUser domain.User
 
 	// check if the user with the email already exists
-	filter := bson.M{"email": loginRequest.Email}
+	filter := bson.D{{Key: "email", Value: loginRequest.Email}}
 	err = collection.FindOne(context.TODO(), filter).Decode(&existingUser)
 	if err != nil {
 		return domain.LoginResponse{}, errors.New("invalid password or email")
